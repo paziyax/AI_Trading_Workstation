@@ -8,21 +8,23 @@ jobs:
   review:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
+      pull-requests: read
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
-          persist-credentials: false
 
       - name: Run OpenCode review
         uses: anomalyco/opencode/github@latest
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: openrouter/deepseek/deepseek-v4.1-flash-1017
+          use_github_token: true
           prompt: |
             Review this pull request.
             - Flag bugs, logic errors, and missing edge cases
