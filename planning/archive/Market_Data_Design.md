@@ -5,8 +5,8 @@ Massive), one shared cache, one SSE stream. Code is written for **Python 3.12 / 
 2.10+** and matches `backend/pyproject.toml`.
 
 Companion references (read for the *why*, this document for the *what*):
-`archive/MASSIVE_API.md` (endpoints, entitlements, timestamps), `archive/MARKET_INTERFACE.md`
-(contract), `archive/MARKET_SIMULATOR.md` (model), `PLAN.md` §6 (requirements).
+`MASSIVE_API.md` (endpoints, entitlements, timestamps), `MARKET_INTERFACE.md`
+(contract), `MARKET_SIMULATOR.md` (model), `../PLAN.md` §6 (requirements).
 
 **Status:** the application code was removed from the repository, so this is a greenfield build.
 Everything below is code to write, not code to modify.
@@ -43,7 +43,7 @@ models ─┼─▶ interface ─▶ cache ─▶ stream
 `cache`, `models`, `stream` never import `simulator` or `massive_client`. That is what makes the
 source swappable and the tests fast.
 
-**Additions beyond `PLAN.md` §8** (all optional, all backward compatible):
+**Additions beyond `../PLAN.md` §8** (all optional, all backward compatible):
 
 | Addition | Why |
 |---|---|

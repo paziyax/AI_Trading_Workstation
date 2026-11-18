@@ -138,6 +138,8 @@ celerybeat.pid
 .env
 .envrc
 .venv
+# Local dependency target used for test runs when uv cannot create a venv
+.pydeps/
 env/
 venv/
 ENV/
