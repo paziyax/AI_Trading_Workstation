@@ -74,8 +74,9 @@ because the write access comes from the app token issued in step 6, not from
 - Plugins do not load in CI. Only `.opencode/opencode.json`, `AGENTS.md`, and the
   workflow inputs take effect, so anything you rely on from a plugin will be
   missing in the runner.
-- Pull requests from forks are not given secrets, so the review workflow stays
-  silent on outside contributions.
+- Pull requests from forks are not given secrets. The workflow still runs, but
+  `OPENROUTER_API_KEY` is empty, so the run fails at auth rather than reviewing.
+  Treat fork pull requests as unreviewed and read them yourself.
 - Draft pull requests are skipped explicitly. `opened` and `synchronize` fire for
   drafts too, so `opencode-review.yml` guards its job with
   `if: github.event.pull_request.draft == false`.
@@ -89,6 +90,6 @@ because the write access comes from the app token issued in step 6, not from
 |---|---|---|
 | The run never starts | The comment did not contain `/oc` or `/opencode`, or the workflow is not on the default branch | Include the trigger phrase and confirm the workflow exists on the default branch |
 | `User <bot> does not have write permissions` | The event's actor has no write access, typically a PR opened by the bot on a `pull_request` event | Use `GITHUB_TOKEN` mode (`use_github_token: true`) for that workflow |
-| `403 Resource not accessible by integration` on issue comments or reactions | Missing `issues: write` or `pull-requests: write` in the job permissions | Grant both permissions as shown in the table above |
+| `403 Resource not accessible by integration` on issue comments or reactions | The job that posts the comment is missing `issues: write` or `pull-requests: write` | Add both to that job's `permissions`; `opencode.yml` does not need them because it uses the app token instead |
 | The run fails fast with an auth error | The app is not installed on this repository, or `OPENROUTER_API_KEY` is unset or misnamed | Install the app on this repository and add the secret under the exact name |
 | The run succeeds but no comment is posted | The instruction was ambiguous, or the model had nothing to add | Make the instruction explicit, and read the run log for the model's output |
