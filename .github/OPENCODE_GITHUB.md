@@ -54,7 +54,7 @@ because the write access comes from the app token issued in step 6, not from
 | Workflow | Trigger | Auth | Permissions |
 |---|---|---|---|
 | `opencode.yml` | `issue_comment`, `pull_request_review_comment`; needs a `/oc` or `/opencode` prefix **and** the commenter to be the repository owner | app mode | `id-token: write`, `contents: read` |
-| `opencode-review.yml` | `pull_request` on `opened`, `synchronize`, `reopened`, `ready_for_review` | `GITHUB_TOKEN` | `contents: read`, `pull-requests: write`, `issues: write` |
+| `opencode-review.yml` | `pull_request` on `opened`, `synchronize`, `reopened`, `ready_for_review`; only for pull requests opened by the repository owner, and only when they are not drafts | `GITHUB_TOKEN` | `contents: read`, `pull-requests: write`, `issues: write` |
 
 ## Required setup
 
@@ -83,6 +83,11 @@ because the write access comes from the app token issued in step 6, not from
 - Draft pull requests are skipped explicitly. `opened` and `synchronize` fire for
   drafts too, so `opencode-review.yml` guards its job with
   `if: github.event.pull_request.draft == false`.
+- Reviewing a pull request someone else opened costs nothing automatically. The
+  review job requires the pull request author to be the repository owner, so
+  outside contributions are never reviewed on their own. To review one, comment
+  `/oc review this pull request` on it: the mention bot is gated on the commenter
+  instead, so it runs for you.
 - `issues: write` alone is not enough for the review workflow to comment on a pull
   request. It needs `pull-requests: write` as well, otherwise the comment request
   returns `403 Resource not accessible by integration`.
