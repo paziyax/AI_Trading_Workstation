@@ -1,40 +1,49 @@
+
 name: opencode-review
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull request number to review"
+        required: true
+        type: number
 
 jobs:
   review:
-    if: >-
-      github.event.pull_request.draft == false &&
-      github.event.pull_request.user.login == github.repository_owner
     concurrency:
-      group: opencode-review-${{ github.event.pull_request.number }}
+      group: opencode-review-${{ inputs.pr_number }}
       cancel-in-progress: true
+
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       pull-requests: write
       issues: write
+
     steps:
-      - name: Checkout repository
+      - name: Checkout pull request
         uses: actions/checkout@v6
         with:
+          ref: refs/pull/${{ inputs.pr_number }}/head
           fetch-depth: 1
           persist-credentials: false
 
       - name: Run OpenCode review
-        uses: anomalyco/opencode/github@f4e363c8295fa90a03dddc451882fffe8fbce357 # v1.19.6
+        uses: anomalyco/opencode/github@f4e363c8295fa90a03dddc451882fffe8fbce357
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: openrouter/deepseek/deepseek-v4.1-flash-1017
           use_github_token: true
           prompt: |
-            Review this pull request.
-            - Flag bugs, logic errors, and missing edge cases
-            - Check the code matches AGENTS.md and planning/PLAN.md
-            - Be concise: bullet points, no praise, no restating the diff
-            - If the PR is fine, reply with a single line saying so
+            Review pull request #${{ inputs.pr_number }} 
+            in ${{ github.repository }}.
+
+            Inspect its title, description, changed files, and diff.
+            Identify bugs, logic errors, and missing edge cases.
+            Post concise, actionable findings on the pull request.
+            Do not modify files, push commits, or merge anything.
