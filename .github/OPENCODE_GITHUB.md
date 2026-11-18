@@ -3,8 +3,10 @@
 How the OpenCode agent is wired into this repository through GitHub Actions,
 what it needs to run, and how to diagnose it when it misbehaves.
 
-This is infrastructure documentation, so it lives beside the workflows rather
-than in `planning/`, which holds project specification and design documents.
+`AGENTS.md` says project documentation lives in `planning/`. This file is the
+one deliberate exception: it documents `.github/workflows/`, so keeping it beside
+the workflows means a change to a workflow and the change to its documentation
+land in the same directory, in the same review.
 
 ## What it is
 
@@ -58,22 +60,25 @@ because the write access comes from the app token issued in step 6, not from
 - Repository secret `OPENROUTER_API_KEY`
 - Permissions exactly as listed in the table above
 - Model: `openrouter/deepseek/deepseek-v4.1-flash-1017`
-- `share: false` in both workflows, so sessions stay private on a public repository
 
 ## Things that surprise people
 
-- CI runs OpenCode V1.19.6 even though local development uses V2. The action
-  installs whatever `anomalyco/opencode` `releases/latest` points to, and at the
-  time of writing that is still the V1 line. Check `releases/latest` rather than
-  assuming this stays true.
-- V2 removed the `opencode github install` setup command, so setup is manual: app,
-  secret, workflow files.
-- V2 plugins do not load in CI. Only `.opencode/opencode.json`, `AGENTS.md`, and
-  the workflow inputs take effect.
+- The action does not pin a version. It installs whichever release
+  `anomalyco/opencode` `releases/latest` points to, so the CI version changes
+  without a commit here. Run `opencode --version` locally and read the run log in
+  CI if behaviour differs between the two; at the time of writing both resolved to
+  the V1 line.
+- Setup is manual: install the app, add the secret, commit the workflow files.
+  Newer CLI releases dropped the `opencode github install` helper command, so do
+  not expect a guided wizard.
+- Plugins do not load in CI. Only `.opencode/opencode.json`, `AGENTS.md`, and the
+  workflow inputs take effect, so anything you rely on from a plugin will be
+  missing in the runner.
 - Pull requests from forks are not given secrets, so the review workflow stays
   silent on outside contributions.
-- Draft pull requests are skipped until they are marked ready for review, because
-  that is the trigger list in `opencode-review.yml`.
+- Draft pull requests are skipped explicitly. `opened` and `synchronize` fire for
+  drafts too, so `opencode-review.yml` guards its job with
+  `if: github.event.pull_request.draft == false`.
 - `issues: write` alone is not enough for the review workflow to comment on a pull
   request. It needs `pull-requests: write` as well, otherwise the comment request
   returns `403 Resource not accessible by integration`.
