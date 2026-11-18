@@ -31,8 +31,10 @@ workflow's declared permissions instead.
 
 ## How the mention bot works
 
-1. A user comments `/oc` (or `/opencode`) followed by an instruction, on an
-   issue or a pull request.
+1. The repository owner (`paziyax`) comments `/oc` (or `/opencode`) followed by
+   an instruction, on an issue or a pull request. The workflow's `if` condition
+   checks `github.event.comment.user.login`, so a comment from anyone else skips
+   the job entirely: no runner, no model call, no cost.
 2. GitHub Actions starts the `opencode` workflow.
 3. `actions/checkout` clones the repository. `persist-credentials` is `false`, so
    the default token is never written into git config.
@@ -51,7 +53,7 @@ because the write access comes from the app token issued in step 6, not from
 
 | Workflow | Trigger | Auth | Permissions |
 |---|---|---|---|
-| `opencode.yml` | `issue_comment`, `pull_request_review_comment`, gated on `/oc` or `/opencode` | app mode | `id-token: write`, `contents: read` |
+| `opencode.yml` | `issue_comment`, `pull_request_review_comment`; needs a `/oc` or `/opencode` prefix **and** the commenter to be the repository owner | app mode | `id-token: write`, `contents: read` |
 | `opencode-review.yml` | `pull_request` on `opened`, `synchronize`, `reopened`, `ready_for_review` | `GITHUB_TOKEN` | `contents: read`, `pull-requests: write`, `issues: write` |
 
 ## Required setup
@@ -63,17 +65,18 @@ because the write access comes from the app token issued in step 6, not from
 
 ## Things that surprise people
 
-- The action does not pin a version. It installs whichever release
-  `anomalyco/opencode` `releases/latest` points to, so the CI version changes
-  without a commit here. Run `opencode --version` locally and read the run log in
-  CI if behaviour differs between the two; at the time of writing both resolved to
-  the V1 line.
+- Two versions float independently of this repository. The action reference is
+  `@latest`, and the action itself downloads the CLI from
+  `https://opencode.ai/install` on every run, so neither is tied to a commit
+  here. Your local CLI can be a different major line from the one CI runs. Use
+  `opencode --version` locally and read the version printed in the run log to
+  compare.
 - Setup is manual: install the app, add the secret, commit the workflow files.
   Newer CLI releases dropped the `opencode github install` helper command, so do
   not expect a guided wizard.
-- Plugins do not load in CI. Only `.opencode/opencode.json`, `AGENTS.md`, and the
-  workflow inputs take effect, so anything you rely on from a plugin will be
-  missing in the runner.
+- The workflow installs no plugin dependencies. The runner loads whatever the CLI
+  finds in the repository, so a plugin that needs npm packages must have them
+  installed by a workflow step; otherwise it works locally and fails in CI.
 - Pull requests from forks are not given secrets. The workflow still runs, but
   `OPENROUTER_API_KEY` is empty, so the run fails at auth rather than reviewing.
   Treat fork pull requests as unreviewed and read them yourself.
@@ -88,7 +91,7 @@ because the write access comes from the app token issued in step 6, not from
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| The run never starts | The comment did not contain `/oc` or `/opencode`, or the workflow is not on the default branch | Include the trigger phrase and confirm the workflow exists on the default branch |
+| The run never starts | The comment came from an account other than `paziyax`, the body does not start with `/oc` or `/opencode`, or the workflow is not on the default branch | Comment from the owner account, begin the comment with the trigger phrase, and confirm the workflow exists on the default branch |
 | `User <bot> does not have write permissions` | The event's actor has no write access, typically a PR opened by the bot on a `pull_request` event | Use `GITHUB_TOKEN` mode (`use_github_token: true`) for that workflow |
 | `403 Resource not accessible by integration` on issue comments or reactions | The job that posts the comment is missing `issues: write` or `pull-requests: write` | Add both to that job's `permissions`; `opencode.yml` does not need them because it uses the app token instead |
 | The run fails fast with an auth error | The app is not installed on this repository, or `OPENROUTER_API_KEY` is unset or misnamed | Install the app on this repository and add the secret under the exact name |
