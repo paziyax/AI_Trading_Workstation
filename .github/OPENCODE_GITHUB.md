@@ -65,12 +65,12 @@ because the write access comes from the app token issued in step 6, not from
 
 ## Things that surprise people
 
-- Two versions float independently of this repository. The action reference is
-  `@latest`, and the action itself downloads the CLI from
-  `https://opencode.ai/install` on every run, so neither is tied to a commit
-  here. Your local CLI can be a different major line from the one CI runs. Use
-  `opencode --version` locally and read the version printed in the run log to
-  compare.
+- The action is pinned by commit SHA (`f4e363c8…`, release v1.19.6), so the
+  workflow logic changes only when this repository is updated. The CLI is a
+  separate matter: the action downloads it from `https://opencode.ai/install` on
+  every run, so the program that actually executes still floats. Your local CLI
+  can be a different major line from the one CI runs; use `opencode --version`
+  locally and read the version printed in the run log to compare.
 - Setup is manual: install the app, add the secret, commit the workflow files.
   Newer CLI releases dropped the `opencode github install` helper command, so do
   not expect a guided wizard.
