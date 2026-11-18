@@ -59,7 +59,7 @@ finally/
 
 ## OpenCode GitHub bot
 
-This repository is wired to the OpenCode GitHub App. Comment `/oc` (or `/opencode`) on an issue or pull request to have the agent run a task, and pull requests get an automatic review. See [OpenCode GitHub Integration](.github/OPENCODE_GITHUB.md) for how it works, required setup, and troubleshooting.
+This repository is wired to the OpenCode GitHub App. Comment `/oc` (or `/opencode`) on an issue or pull request to have the agent run a task, and pull requests are reviewed automatically once they are marked ready for review. See [OpenCode GitHub Integration](.github/OPENCODE_GITHUB.md) for how it works, required setup, and troubleshooting.
 
 ## License
 
