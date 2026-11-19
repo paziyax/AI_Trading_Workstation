@@ -231,3 +231,6 @@ db/*.db-shm
 
 # Dezign0 scratch artifacts (design/<slug>/ is working output, not source)
 design/
+
+# Local agent worktrees (inside the repo, never committed)
+.worktrees/
