@@ -124,14 +124,14 @@ def build_context(portfolio: dict, watchlist: list[dict], recent_trades: list[di
 
 # app/llm/client.py
 class ChatClient(Protocol):
-    async def complete(self, *, user_message: str, context: str,
+    async def complete(self, *, user_message: str, context: str, portfolio: dict,
                        history: list[tuple[str, str]]) -> LLMResponse: ...
 class LLMError(RuntimeError): ...
 def create_chat_client(config: LLMConfig) -> ChatClient   # mock or live
 ```
 
-`build_context` receives plain dicts shaped like `GET /api/portfolio` and
-`GET /api/watchlist` items — no imports from `app.db` or `app.api`.
+`build_context` and the mock client receive plain dicts shaped like `GET /api/portfolio`
+and `GET /api/watchlist` items — no imports from `app.db` or `app.api`.
 
 ### API → Frontend
 
