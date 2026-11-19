@@ -14,7 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# Repo-root only: a bare "lib/" would also hide frontend/src/lib/
+/lib/
 lib64/
 parts/
 sdist/
