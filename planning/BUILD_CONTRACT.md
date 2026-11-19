@@ -93,7 +93,8 @@ shims) — Smart App Control blocks freshly created unsigned shims.
 - Startup: load `.env` → `Database.initialize()` → build `PriceCache` → create and
   `start()` the market source with the current watchlist → start the 30 s snapshot task.
 - Shutdown: stop the source, cancel the snapshot task. Both idempotent.
-- The database file lives on a Docker volume at `/app/db`; the app must create it if absent.
+- The database file lives on a Docker volume at `/app/data` (kept separate from `/app/db`,
+  which holds `schema.sql`/`seed.sql`); the app must create it if absent.
 - `LLM_MOCK=true` must make zero network calls.
 - No CORS config: same origin only.
 
@@ -139,7 +140,7 @@ Only `API_CONTRACT.md`. Frontend must not import backend code.
 
 ### DevOps → everyone
 
-Container listens on `8000`; `STATIC_DIR=/app/static`; `FINALLY_DB_PATH=/app/db/finally.db`.
+Container listens on `8000`; `STATIC_DIR=/app/static`; `FINALLY_DB_PATH=/app/data/finally.db`.
 Docker is **not** installed on this machine: write and review configs, never run `docker`
 or install it. Scripts must be idempotent and support `--build`.
 

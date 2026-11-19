@@ -50,15 +50,17 @@ RUN uv sync --frozen --no-dev \
 COPY --from=frontend /app/out ./static
 
 # Runtime SQLite directory. It is a named volume at runtime; appuser must own it.
+# Deliberately /app/data, not /app/db: backend/db/ (schema.sql, seed.sql) is copied
+# to /app/db and the volume must not shadow it.
 RUN groupadd --gid 10001 appuser \
     && useradd --uid 10001 --gid appuser --no-create-home --home-dir /app \
         --shell /usr/sbin/nologin appuser \
-    && mkdir -p /app/db \
-    && chown -R appuser:appuser /app/db
+    && mkdir -p /app/data \
+    && chown -R appuser:appuser /app/data
 
 ENV PATH="/app/.venv/bin:${PATH}" \
     STATIC_DIR=/app/static \
-    FINALLY_DB_PATH=/app/db/finally.db
+    FINALLY_DB_PATH=/app/data/finally.db
 
 EXPOSE 8000
 

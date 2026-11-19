@@ -234,3 +234,6 @@ design/
 
 # Local agent worktrees (inside the repo, never committed)
 .worktrees/
+
+# Playwright MCP scratch output
+.playwright-mcp/

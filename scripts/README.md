@@ -70,7 +70,7 @@ docker logs -f finally
 ## Where data lives
 
 The SQLite database is stored in the named Docker volume **`finally-data`**,
-mounted at `/app/db` inside the container (`/app/db/finally.db`). It survives
+mounted at `/app/data` inside the container (`/app/data/finally.db`). It survives
 `stop`, container removal and image rebuilds. `docker compose down` also keeps it.
 
 The repo's `db/` directory is only the local mount-point placeholder; with Docker

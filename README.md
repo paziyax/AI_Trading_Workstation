@@ -32,7 +32,7 @@ cp .env.example .env
 
 # Run with Docker
 docker build -t finally .
-docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally
+docker run -v finally-data:/app/data -p 8000:8000 --env-file .env finally
 
 # Open http://localhost:8000
 ```
@@ -57,7 +57,7 @@ Copy-Item .env.example .env        # first run only; add OPENROUTER_API_KEY
 ```
 
 Open **http://localhost:8000**. The SQLite database lives in the named volume
-`finally-data` mounted at `/app/db`, so it survives restarts and rebuilds; the stop
+`finally-data` mounted at `/app/data`, so it survives restarts and rebuilds; the stop
 scripts never delete it. To reset the portfolio, stop the container and run
 `docker volume rm finally-data`. Full details: [scripts/README.md](scripts/README.md).
 

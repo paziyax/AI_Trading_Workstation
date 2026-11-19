@@ -72,7 +72,7 @@ fi
 echo "Starting ${CONTAINER_NAME} ..."
 if ! docker run -d \
   --name "${CONTAINER_NAME}" \
-  -v "${VOLUME_NAME}:/app/db" \
+  -v "${VOLUME_NAME}:/app/data" \
   -p "${HOST_PORT}:8000" \
   --env-file .env \
   --restart unless-stopped \

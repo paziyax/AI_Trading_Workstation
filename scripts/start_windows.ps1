@@ -93,7 +93,7 @@ if (Test-ContainerExists $ContainerName) {
 Write-Host "Starting $ContainerName ..."
 & docker run -d `
     --name $ContainerName `
-    -v "${VolumeName}:/app/db" `
+    -v "${VolumeName}:/app/data" `
     -p "${HostPort}:8000" `
     --env-file $EnvFile `
     --restart unless-stopped `
