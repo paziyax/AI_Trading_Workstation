@@ -37,6 +37,32 @@ docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally
 # Open http://localhost:8000
 ```
 
+## Run with Docker
+
+The app ships as one container (FastAPI serving the static Next.js export) on port 8000.
+Build once, then use the start/stop scripts:
+
+```bash
+# macOS / Linux
+cp .env.example .env               # first run only; add OPENROUTER_API_KEY
+./scripts/start_mac.sh --build     # build + start detached
+./scripts/stop_mac.sh              # stop and remove the container
+```
+
+```powershell
+# Windows PowerShell
+Copy-Item .env.example .env        # first run only; add OPENROUTER_API_KEY
+.\scripts\start_windows.ps1 -Build
+.\scripts\stop_windows.ps1
+```
+
+Open **http://localhost:8000**. The SQLite database lives in the named volume
+`finally-data` mounted at `/app/db`, so it survives restarts and rebuilds; the stop
+scripts never delete it. To reset the portfolio, stop the container and run
+`docker volume rm finally-data`. Full details: [scripts/README.md](scripts/README.md).
+
+Compose users can run `docker compose up -d --build` instead.
+
 ## Environment Variables
 
 | Variable | Required | Description |
