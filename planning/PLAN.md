@@ -128,14 +128,24 @@ OPENROUTER_API_KEY=your-openrouter-api-key-here
 # If not set, the built-in market simulator is used (recommended for most users)
 MASSIVE_API_KEY=
 
+# Optional: which source to use. auto = key present ? massive : simulator
+MARKET_DATA_SOURCE=auto
+
+# Optional: your Massive subscription tier. Decides snapshots vs end-of-day mode.
+# basic | starter | developer | advanced
+MASSIVE_PLAN=basic
+
 # Optional: Set to "true" for deterministic mock LLM responses (testing)
 LLM_MOCK=false
 ```
 
 ### Behavior
 
-- If `MASSIVE_API_KEY` is set and non-empty → backend uses Massive REST API for market data
-- If `MASSIVE_API_KEY` is absent or empty → backend uses the built-in market simulator
+- `MARKET_DATA_SOURCE=auto` (default): a non-empty `MASSIVE_API_KEY` selects Massive, an empty key selects the simulator
+- `MARKET_DATA_SOURCE=simulator` forces the simulator even when a key is present
+- `MARKET_DATA_SOURCE=massive` forces Massive, and is a startup error if the key is empty
+- A key alone does not mean intraday data: `MASSIVE_PLAN` decides the mode. `basic` has no snapshot entitlement, so the source runs end-of-day and prices do not move
+- Real-time intraday requires the **Advanced** plan. Starter and Developer are 15-minute delayed; Basic is end-of-day only
 - If `LLM_MOCK=true` → backend returns deterministic mock LLM responses (for E2E tests)
 - The backend reads `.env` from the project root (mounted into the container or read via docker `--env-file`)
 
@@ -159,9 +169,12 @@ Both the simulator and the Massive client implement the same abstract interface.
 ### Massive API (Optional)
 
 - REST API polling (not WebSocket) — simpler, works on all tiers
-- Polls for the union of all watched tickers on a configurable interval
-- Free tier (5 calls/min): poll every 15 seconds
-- Paid tiers: poll every 2-15 seconds depending on tier
+- Two modes, chosen from `MASSIVE_PLAN`:
+  - **snapshot** (Starter and above) polls the union of watched tickers every `MASSIVE_POLL_INTERVAL`, floored at 15 seconds on Basic and 2 seconds on paid tiers
+  - **end-of-day** (Basic) reads one grouped-daily response, walks back over weekends and holidays, and refreshes every 30 minutes
+- Snapshot mode skips polling while the market is closed, and downgrades to end-of-day at runtime on a `403 NOT_AUTHORIZED`
+- Free Basic tier is an end-of-day source: 5 calls/min, no snapshot entitlement, so it never produces live prices
+- Starter and Developer return snapshot data with a 15-minute delay; only Advanced is real time
 - Parses REST response into the same format as the simulator
 
 ### Shared Price Cache

@@ -69,7 +69,39 @@ Compose users can run `docker compose up -d --build` instead.
 |---|---|---|
 | `OPENROUTER_API_KEY` | Yes | OpenRouter API key for AI chat |
 | `MASSIVE_API_KEY` | No | Massive (Polygon.io) key for real market data; omit to use simulator |
+| `MARKET_DATA_SOURCE` | No | `auto` (default), `massive` or `simulator` |
+| `MASSIVE_PLAN` | No | Your Massive tier: `basic` (default), `starter`, `developer`, `advanced` |
 | `LLM_MOCK` | No | Set `true` for deterministic mock LLM responses (testing) |
+
+## Market Data: Simulator or Massive
+
+The app ships with a **built-in simulator**, so it works with no market data account at all.
+Massive is optional and is only called when you configure it.
+
+| Want | Configure |
+|---|---|
+| Fake prices — free, ~2 updates/sec, runs 24/7 | leave `MASSIVE_API_KEY` empty, or set `MARKET_DATA_SOURCE=simulator` |
+| Real prices | set `MASSIVE_API_KEY=...` and `MASSIVE_PLAN=<your tier>` |
+| Force a specific source | `MARKET_DATA_SOURCE=simulator` or `MARKET_DATA_SOURCE=massive` |
+
+- The default is `MARKET_DATA_SOURCE=auto`: a key means Massive, no key means the simulator.
+- `MARKET_DATA_SOURCE=massive` with an empty key fails at startup instead of silently falling back.
+- `MASSIVE_PLAN` must match what you actually bought. The backend picks its data mode from the plan,
+  not from the key alone.
+
+### Which Massive plan gives real intraday prices
+
+| Plan | Price | Data recency | Produces live prices? |
+|---|---|---|---|
+| Basic | free | end of day | **No** — end-of-day bars, refreshed every 30 min |
+| Starter | $29/mo | 15-minute delayed | delayed only |
+| Developer | $79/mo | 15-minute delayed | delayed only |
+| Advanced | $199/mo | real time | **Yes** |
+
+A Basic key authenticates fine but is **not entitled to snapshots**, so the backend falls back to
+end-of-day mode and prices look frozen. If the UI shows no prices, check `/api/health`:
+`"mode": "eod"` means the plan is too low; `"mode": "simulator"` means the simulator is running.
+Full entitlement table: [planning/archive/MASSIVE_API.md](planning/archive/MASSIVE_API.md).
 
 ## Project Structure
 
