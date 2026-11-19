@@ -78,14 +78,16 @@ npm --prefix frontend install
 npm --prefix frontend run test -- --run
 npm --prefix frontend run build          # produces frontend/out
 
-# run the whole app natively (no Docker), from repo root
-$env:LLM_MOCK="true"; $env:STATIC_DIR="frontend/out"
-uv run --project backend uvicorn app.main:app --port 8000
+# run the whole app natively (no Docker): from the repo root, cd backend first
+cd backend
+$env:LLM_MOCK="true"
+uv run --module uvicorn app.main:app --port 8000
 ```
 
 Run pytest **from `backend/`** — invoking it from the repo root picks the wrong rootdir and
 produces spurious failures. On this machine use `uv run --module pytest` (not the `.exe`
-shims) — Smart App Control blocks freshly created unsigned shims.
+shims) — Smart App Control blocks freshly created unsigned shims, and the same applies to
+`uvicorn`.
 
 ## Runtime behaviour
 

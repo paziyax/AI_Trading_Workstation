@@ -63,6 +63,35 @@ scripts never delete it. To reset the portfolio, stop the container and run
 
 Compose users can run `docker compose up -d --build` instead.
 
+## Run Locally (No Docker)
+
+Start from the repo root and `cd backend` first, so the relative paths resolve.
+
+**Real market data** — needs a Massive key in `.env` and a paid plan:
+
+```powershell
+cd backend
+uv run --module uvicorn app.main:app --port 8000
+```
+
+**Simulator (fake prices, free, no key needed)** — add one line before the same command:
+
+```powershell
+cd backend
+$env:MARKET_DATA_SOURCE="simulator"
+uv run --module uvicorn app.main:app --port 8000
+```
+
+Open **http://localhost:8000**. The frontend is served from `frontend/out`; if the page is
+blank, build it once with `npm --prefix frontend run build`.
+
+A `$env:` value always wins over `.env`, so the simulator line never touches your keys.
+
+Use `--module uvicorn`. Windows Smart App Control blocks the `uvicorn.exe` shim.
+
+> With a free **Basic** Massive key the first command shows frozen prices, because Basic is
+> end-of-day only. Use the simulator command, or move to a plan that includes snapshots.
+
 ## Environment Variables
 
 | Variable | Required | Description |
@@ -88,6 +117,8 @@ Massive is optional and is only called when you configure it.
 - `MARKET_DATA_SOURCE=massive` with an empty key fails at startup instead of silently falling back.
 - `MASSIVE_PLAN` must match what you actually bought. The backend picks its data mode from the plan,
   not from the key alone.
+- These values work in `.env` or in your shell. A shell value always wins, so `.env` is never
+  overwritten.
 
 ### Which Massive plan gives real intraday prices
 

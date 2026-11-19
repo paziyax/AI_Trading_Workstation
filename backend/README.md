@@ -33,6 +33,17 @@ entitlement poll snapshots; Basic uses grouped-daily end-of-day data.
 | `MASSIVE_EOD_LOOKBACK` | `5` | sessions to walk back over holidays |
 | `SIM_EVENT_PROBABILITY` | `0.001` | per-tick jump chance |
 
+## Run
+
+From this directory (`backend/`):
+
+```powershell
+uv run --module uvicorn app.main:app --port 8000
+```
+
+Add `$env:MARKET_DATA_SOURCE="simulator"` first for the free simulator; omit it to use
+Massive with the key from `.env`.
+
 ## Tests
 
 ```bash
