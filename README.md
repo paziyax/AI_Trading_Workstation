@@ -20,7 +20,7 @@ Single Docker container serving everything on port 8000:
 - **Frontend**: Next.js (static export) with TypeScript and Tailwind CSS
 - **Backend**: FastAPI (Python/uv) with SSE streaming
 - **Database**: SQLite with lazy initialization
-- **AI**: LiteLLM → OpenRouter (Cerebras inference) with structured outputs
+- **AI**: LiteLLM → OpenRouter (DeepSeek V4.1 Flash 1017) with structured outputs
 - **Market data**: Built-in GBM simulator (default) or Massive API (optional)
 
 ## Quick Start

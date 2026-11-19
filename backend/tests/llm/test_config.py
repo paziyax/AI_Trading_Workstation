@@ -19,9 +19,9 @@ def test_defaults_with_empty_environment() -> None:
 
     assert config.mock is False
     assert config.api_key == ""
-    assert config.model == "openrouter/openai/gpt-oss-120b"
+    assert config.model == "openrouter/deepseek/deepseek-v4.1-flash-1017"
     assert config.model == DEFAULT_MODEL
-    assert config.provider == DEFAULT_PROVIDER
+    assert config.provider == DEFAULT_PROVIDER == ""
     assert config.timeout == DEFAULT_TIMEOUT_SECONDS == 30.0
 
 
@@ -30,7 +30,7 @@ def test_documented_variables_are_read() -> None:
         {
             "OPENROUTER_API_KEY": "  sk-or-test  ",
             "LLM_MOCK": "true",
-            "LLM_MODEL": "openrouter/openai/gpt-oss-20b",
+            "LLM_MODEL": "openrouter/meta-llama/llama-3.3-70b-instruct",
             "LLM_PROVIDER": "Groq",
             "LLM_TIMEOUT_SECONDS": "12.5",
         }
@@ -38,7 +38,7 @@ def test_documented_variables_are_read() -> None:
 
     assert config.mock is True
     assert config.api_key == "sk-or-test"
-    assert config.model == "openrouter/openai/gpt-oss-20b"
+    assert config.model == "openrouter/meta-llama/llama-3.3-70b-instruct"
     assert config.provider == "groq"
     assert config.timeout == 12.5
 
@@ -83,13 +83,13 @@ def test_missing_api_key_does_not_raise() -> None:
 
 def test_from_env_reads_os_environ_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LLM_MODEL", "openrouter/meta-llama/llama-3.3-70b-instruct")
-    monkeypatch.setenv("LLM_PROVIDER", "cerebras")
+    monkeypatch.setenv("LLM_PROVIDER", "groq")
     monkeypatch.setenv("LLM_MOCK", "1")
 
     config = LLMConfig.from_env()
 
     assert config.model == "openrouter/meta-llama/llama-3.3-70b-instruct"
-    assert config.provider == "cerebras"
+    assert config.provider == "groq"
     assert config.mock is True
 
 

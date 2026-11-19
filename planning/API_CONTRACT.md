@@ -24,7 +24,7 @@ Anything not listed here is implementation detail and may change freely.
   "market": { "mode": "simulator", "connected": true, "detail": "simulator",
               "last_success_at": 1795102697.4, "consecutive_failures": 0,
               "last_error": null, "age_seconds": 0.5 },
-  "llm": { "mode": "mock", "model": "openrouter/openai/gpt-oss-120b" }
+  "llm": { "mode": "mock", "model": "openrouter/deepseek/deepseek-v4.1-flash-1017" }
 }
 ```
 

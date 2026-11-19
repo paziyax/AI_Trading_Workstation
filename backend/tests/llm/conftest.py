@@ -15,8 +15,8 @@ def make_config(**overrides: Any) -> LLMConfig:
     base = {
         "mock": False,
         "api_key": "test-key",
-        "model": "openrouter/openai/gpt-oss-120b",
-        "provider": "cerebras",
+        "model": "openrouter/deepseek/deepseek-v4.1-flash-1017",
+        "provider": "",
         "timeout": 30.0,
     }
     return LLMConfig(**{**base, **overrides})

@@ -31,13 +31,14 @@ async def test_complete_sends_the_documented_request(
 
     assert len(fake.calls) == 1
     call = fake.calls[0]
-    assert call["model"] == "openrouter/openai/gpt-oss-120b"
+    assert call["model"] == "openrouter/deepseek/deepseek-v4.1-flash-1017"
     assert call["api_key"] == "test-key"
     assert call["timeout"] == 30.0
     assert call["num_retries"] == 1
     assert call["temperature"] == 0.2
     assert call["reasoning_effort"] == "low"
-    assert call["extra_body"] == {"provider": {"order": ["cerebras"], "allow_fallbacks": True}}
+    # No provider configured: OpenRouter routes, so no ordering is sent at all.
+    assert "extra_body" not in call
 
 
 async def test_complete_requests_the_strict_json_schema(fake_acompletion: Any) -> None:

@@ -53,8 +53,8 @@ docker-compose.yml
 | `MARKET_DATA_SOURCE` | `auto` | market (existing) |
 | `MASSIVE_PLAN` | `basic` | market (existing) |
 | `LLM_MOCK` | `false` | LLM |
-| `LLM_MODEL` | `openrouter/openai/gpt-oss-120b` | LLM |
-| `LLM_PROVIDER` | `cerebras` | LLM (OpenRouter provider order) |
+| `LLM_MODEL` | `openrouter/deepseek/deepseek-v4.1-flash-1017` | LLM |
+| `LLM_PROVIDER` | empty | LLM (optional provider pin; empty lets OpenRouter route) |
 | `LLM_TIMEOUT_SECONDS` | `30` | LLM |
 | `FINALLY_DB_PATH` | `<repo>/db/finally.db` | DB |
 | `INITIAL_CASH` | `10000` | DB seed / API |

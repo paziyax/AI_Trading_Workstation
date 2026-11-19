@@ -48,7 +48,6 @@ export default defineConfig({
     env: {
       ...process.env,
       LLM_MOCK: "true",
-      LLM_PROVIDER: "cerebras",
       MARKET_DATA_SOURCE: "simulator",
       MASSIVE_API_KEY: "",
       FINALLY_DB_PATH: dbPath,

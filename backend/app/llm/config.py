@@ -14,8 +14,9 @@ import os
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-DEFAULT_MODEL = "openrouter/openai/gpt-oss-120b"
-DEFAULT_PROVIDER = "cerebras"
+DEFAULT_MODEL = "openrouter/deepseek/deepseek-v4.1-flash-1017"
+# Empty provider = no provider ordering in the request; OpenRouter routes the model itself.
+DEFAULT_PROVIDER = ""
 DEFAULT_TIMEOUT_SECONDS = 30.0
 
 _TRUTHY = frozenset({"1", "true", "yes", "on"})

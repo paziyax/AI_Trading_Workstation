@@ -1,8 +1,9 @@
 """Live and mock chat clients plus the shared error type and protocol.
 
-The live client talks to OpenRouter through LiteLLM, pinning Cerebras as the inference
-provider. Structured output is requested with a strict hand-written JSON schema and the
-reply is parsed into :class:`~app.llm.schemas.LLMResponse`.
+The live client talks to OpenRouter through LiteLLM. Provider routing is left to
+OpenRouter unless ``LLM_PROVIDER`` names one explicitly. Structured output is requested
+with a strict hand-written JSON schema and the reply is parsed into
+:class:`~app.llm.schemas.LLMResponse`.
 
 Every failure mode the API layer can act on - missing key, transport error, empty reply,
 invalid JSON, schema violation - is normalised to :class:`LLMError` so the API can answer
@@ -44,7 +45,7 @@ class ChatClient(Protocol):
 
 
 class LiveChatClient:
-    """OpenRouter + Cerebras implementation of :class:`ChatClient`."""
+    """OpenRouter implementation of :class:`ChatClient`."""
 
     def __init__(self, config: LLMConfig) -> None:
         self._config = config
@@ -69,27 +70,31 @@ class LiveChatClient:
 
         messages = build_messages(user_message=user_message, context=context, history=history)
 
+        request: dict[str, Any] = {
+            "model": config.model,
+            "messages": messages,
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "finally_chat",
+                    "strict": True,
+                    "schema": RESPONSE_JSON_SCHEMA,
+                },
+            },
+            "api_key": config.api_key,
+            "timeout": config.timeout,
+            "num_retries": NUM_RETRIES,
+            "temperature": TEMPERATURE,
+            "reasoning_effort": REASONING_EFFORT,
+        }
+        if config.provider:
+            # Opt-in pin only. Leaving LLM_PROVIDER empty lets OpenRouter route.
+            request["extra_body"] = {
+                "provider": {"order": [config.provider], "allow_fallbacks": True}
+            }
+
         try:
-            response = await litellm.acompletion(
-                model=config.model,
-                messages=messages,
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": {
-                        "name": "finally_chat",
-                        "strict": True,
-                        "schema": RESPONSE_JSON_SCHEMA,
-                    },
-                },
-                extra_body={
-                    "provider": {"order": [config.provider], "allow_fallbacks": True}
-                },
-                api_key=config.api_key,
-                timeout=config.timeout,
-                num_retries=NUM_RETRIES,
-                temperature=TEMPERATURE,
-                reasoning_effort=REASONING_EFFORT,
-            )
+            response = await litellm.acompletion(**request)
         except Exception as exc:
             raise LLMError(
                 f"LLM request failed: {_describe(exc, config.api_key)}"
