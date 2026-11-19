@@ -1,0 +1,39 @@
+# Keep the build context small and never ship secrets or local state.
+# frontend/package.json and frontend/package-lock.json must stay included.
+
+# Version control and agent/editor metadata
+.git
+.gitignore
+.github
+.opencode
+.design-os
+design
+planning
+test
+
+# Secrets (never bake .env into an image)
+.env
+.env.*
+!.env.example
+
+# Python
+**/.venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+.coverage
+.coverage.*
+htmlcov
+
+# Node / Next.js build output and dependencies
+**/node_modules
+**/.next
+**/out
+**/*.tsbuildinfo
+
+# Runtime SQLite files (the image creates its own empty db directory)
+db/*.db
+db/*.db-wal
+db/*.db-shm
